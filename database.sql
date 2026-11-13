@@ -4,7 +4,14 @@ CREATE DATABASE IF NOT EXISTS refugio_solidario
 
 USE refugio_solidario;
 
-CREATE TABLE IF NOT EXISTS refugios (
+CREATE TABLE IF NOT EXISTS usuarios (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    activo BOOLEAN NOT NULL DEFAULT TRUE
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS refugio (
     id_refugio INT AUTO_INCREMENT PRIMARY KEY,
     codigo VARCHAR(20) NOT NULL UNIQUE,
     nombre VARCHAR(100) NOT NULL,
@@ -22,7 +29,7 @@ CREATE TABLE IF NOT EXISTS habitaciones (
     descripcion VARCHAR(150),
     UNIQUE KEY uq_habitacion_refugio (id_refugio, numero),
     FOREIGN KEY (id_refugio)
-        REFERENCES refugios (id_refugio)
+        REFERENCES refugio (id_refugio)
         ON DELETE RESTRICT
 ) ENGINE = InnoDB;
 
@@ -38,10 +45,19 @@ CREATE TABLE IF NOT EXISTS camas (
         ON DELETE RESTRICT
 ) ENGINE = InnoDB;
 
-CREATE TABLE IF NOT EXISTS beneficiarios (
-    id_beneficiario INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS personas (
+    id_persona INT AUTO_INCREMENT PRIMARY KEY,
     codigo VARCHAR(20) NOT NULL UNIQUE,
-    fecha_registro DATE NOT NULL,
+    nombres VARCHAR(80) NOT NULL,
+    apellido_paterno VARCHAR(60) NOT NULL,
+    apellido_materno VARCHAR(60),
+    tipo_documento VARCHAR(30) NOT NULL DEFAULT 'CARNET DE IDENTIDAD',
+    numero_documento VARCHAR(40) NOT NULL UNIQUE,
+    fecha_nacimiento DATE,
+    telefono VARCHAR(25),
+    direccion VARCHAR(200),
+    fecha_registro DATE NOT NULL DEFAULT (CURRENT_DATE),
+    estado ENUM('ACTIVA', 'RETIRADA') NOT NULL DEFAULT 'ACTIVA',
     observaciones VARCHAR(200)
 ) ENGINE = InnoDB;
 
@@ -49,35 +65,23 @@ CREATE TABLE IF NOT EXISTS ocupaciones (
     id_ocupacion INT AUTO_INCREMENT PRIMARY KEY,
     codigo VARCHAR(20) NOT NULL UNIQUE,
     id_cama INT NOT NULL,
-    id_beneficiario INT NOT NULL,
+    id_persona INT NOT NULL,
     fecha_ingreso DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     fecha_salida DATETIME NULL,
-    -- UNIQUE permite varios NULL: solo una ocupacion activa por cama/beneficiario.
     cama_activa INT GENERATED ALWAYS AS (
         CASE WHEN fecha_salida IS NULL THEN id_cama ELSE NULL END
     ) STORED,
-    beneficiario_activo INT GENERATED ALWAYS AS (
-        CASE WHEN fecha_salida IS NULL THEN id_beneficiario ELSE NULL END
+    persona_activa INT GENERATED ALWAYS AS (
+        CASE WHEN fecha_salida IS NULL THEN id_persona ELSE NULL END
     ) STORED,
     UNIQUE KEY uq_cama_activa (cama_activa),
-    UNIQUE KEY uq_beneficiario_activo (beneficiario_activo),
+    UNIQUE KEY uq_persona_activa (persona_activa),
     CHECK (fecha_salida IS NULL OR fecha_salida >= fecha_ingreso),
     FOREIGN KEY (id_cama)
         REFERENCES camas (id_cama)
         ON DELETE RESTRICT,
-    FOREIGN KEY (id_beneficiario)
-        REFERENCES beneficiarios (id_beneficiario)
-        ON DELETE RESTRICT
-) ENGINE = InnoDB;
-
-CREATE TABLE IF NOT EXISTS comedores (
-    id_comedor INT AUTO_INCREMENT PRIMARY KEY,
-    codigo VARCHAR(20) NOT NULL UNIQUE,
-    nombre VARCHAR(100) NOT NULL,
-    direccion VARCHAR(200) NOT NULL,
-    id_refugio INT NULL,
-    FOREIGN KEY (id_refugio)
-        REFERENCES refugios (id_refugio)
+    FOREIGN KEY (id_persona)
+        REFERENCES personas (id_persona)
         ON DELETE RESTRICT
 ) ENGINE = InnoDB;
 
@@ -91,18 +95,37 @@ CREATE TABLE IF NOT EXISTS alimentos (
 CREATE TABLE IF NOT EXISTS inventarios (
     id_inventario INT AUTO_INCREMENT PRIMARY KEY,
     codigo VARCHAR(20) NOT NULL UNIQUE,
-    id_comedor INT NOT NULL,
+    id_refugio INT NOT NULL,
     id_alimento INT NOT NULL,
     lote VARCHAR(50) NOT NULL,
     cantidad DECIMAL(10, 2) NOT NULL DEFAULT 0,
     fecha_vencimiento DATE NULL,
-    UNIQUE KEY uq_lote_comedor_alimento (id_comedor, id_alimento, lote),
+    UNIQUE KEY uq_lote_refugio_alimento (id_refugio, id_alimento, lote),
     CHECK (cantidad >= 0),
-    FOREIGN KEY (id_comedor)
-        REFERENCES comedores (id_comedor)
+    FOREIGN KEY (id_refugio)
+        REFERENCES refugio (id_refugio)
         ON DELETE RESTRICT,
     FOREIGN KEY (id_alimento)
         REFERENCES alimentos (id_alimento)
+        ON DELETE RESTRICT
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS movimientos_inventario (
+    id_movimiento INT AUTO_INCREMENT PRIMARY KEY,
+    codigo VARCHAR(20) NOT NULL UNIQUE,
+    id_inventario INT NOT NULL,
+    tipo_movimiento ENUM(
+        'ENTRADA_DONACION',
+        'SALIDA_RACION',
+        'AJUSTE_ENTRADA',
+        'AJUSTE_SALIDA'
+    ) NOT NULL,
+    cantidad DECIMAL(10, 2) NOT NULL,
+    fecha_movimiento DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    motivo VARCHAR(200),
+    CHECK (cantidad > 0),
+    FOREIGN KEY (id_inventario)
+        REFERENCES inventarios (id_inventario)
         ON DELETE RESTRICT
 ) ENGINE = InnoDB;
 
@@ -118,14 +141,14 @@ CREATE TABLE IF NOT EXISTS donaciones (
     id_donacion INT AUTO_INCREMENT PRIMARY KEY,
     codigo VARCHAR(20) NOT NULL UNIQUE,
     id_donante INT NOT NULL,
-    id_comedor INT NOT NULL,
+    id_refugio INT NOT NULL,
     fecha_donacion DATE NOT NULL,
     observaciones VARCHAR(200),
     FOREIGN KEY (id_donante)
         REFERENCES donantes (id_donante)
         ON DELETE RESTRICT,
-    FOREIGN KEY (id_comedor)
-        REFERENCES comedores (id_comedor)
+    FOREIGN KEY (id_refugio)
+        REFERENCES refugio (id_refugio)
         ON DELETE RESTRICT
 ) ENGINE = InnoDB;
 
@@ -134,6 +157,7 @@ CREATE TABLE IF NOT EXISTS detalle_donaciones (
     codigo VARCHAR(20) NOT NULL UNIQUE,
     id_donacion INT NOT NULL,
     id_alimento INT NOT NULL,
+    lote VARCHAR(50) NOT NULL,
     cantidad DECIMAL(10, 2) NOT NULL,
     fecha_vencimiento DATE NULL,
     CHECK (cantidad > 0),
@@ -148,18 +172,33 @@ CREATE TABLE IF NOT EXISTS detalle_donaciones (
 CREATE TABLE IF NOT EXISTS raciones (
     id_racion INT AUTO_INCREMENT PRIMARY KEY,
     codigo VARCHAR(20) NOT NULL UNIQUE,
-    id_comedor INT NOT NULL,
+    id_refugio INT NOT NULL,
     fecha_entrega DATE NOT NULL,
+    tipo_comida ENUM('DESAYUNO', 'ALMUERZO', 'CENA', 'OTRA')
+        NOT NULL DEFAULT 'OTRA',
     cantidad INT NOT NULL,
     observaciones VARCHAR(200),
     CHECK (cantidad > 0),
-    FOREIGN KEY (id_comedor)
-        REFERENCES comedores (id_comedor)
+    FOREIGN KEY (id_refugio)
+        REFERENCES refugio (id_refugio)
         ON DELETE RESTRICT
 ) ENGINE = InnoDB;
 
--- Vista para el panel de ocupacion. No cuenta como tabla.
-CREATE OR REPLACE VIEW vista_ocupacion_refugios AS
+CREATE TABLE IF NOT EXISTS detalle_raciones (
+    id_detalle_racion INT AUTO_INCREMENT PRIMARY KEY,
+    id_racion INT NOT NULL,
+    id_inventario INT NOT NULL,
+    cantidad_consumida DECIMAL(10, 2) NOT NULL,
+    CHECK (cantidad_consumida > 0),
+    FOREIGN KEY (id_racion)
+        REFERENCES raciones (id_racion)
+        ON DELETE RESTRICT,
+    FOREIGN KEY (id_inventario)
+        REFERENCES inventarios (id_inventario)
+        ON DELETE RESTRICT
+) ENGINE = InnoDB;
+
+CREATE OR REPLACE VIEW vista_ocupacion_refugio AS
 SELECT
     r.id_refugio,
     r.nombre,
@@ -179,7 +218,7 @@ SELECT
             THEN 1
         END
     ) AS camas_disponibles
-FROM refugios r
+FROM refugio r
 LEFT JOIN habitaciones h
     ON h.id_refugio = r.id_refugio
 LEFT JOIN camas c
@@ -188,116 +227,3 @@ LEFT JOIN ocupaciones o
     ON o.id_cama = c.id_cama
     AND o.fecha_salida IS NULL
 GROUP BY r.id_refugio, r.nombre;
-
-INSERT INTO refugios (
-    codigo,
-    nombre,
-    direccion,
-    telefono,
-    capacidad_planificada
-) VALUES
-    ('REF-001', 'Refugio Esperanza', 'Zona Central, La Paz', '70000001', 20),
-    ('REF-002', 'Centro Nueva Vida', 'Zona Sur, La Paz', '70000002', 15);
-
-INSERT INTO habitaciones (
-    codigo,
-    id_refugio,
-    numero,
-    descripcion
-) VALUES
-    ('HAB-001', 1, 'H-01', 'Habitacion principal'),
-    ('HAB-002', 1, 'H-02', 'Habitacion secundaria'),
-    ('HAB-003', 2, 'H-01', 'Habitacion principal');
-
-INSERT INTO camas (
-    codigo,
-    id_habitacion,
-    estado
-) VALUES
-    ('CAM-001', 1, 'HABILITADA'),
-    ('CAM-002', 1, 'HABILITADA'),
-    ('CAM-003', 2, 'MANTENIMIENTO'),
-    ('CAM-004', 3, 'HABILITADA');
-
-INSERT INTO beneficiarios (
-    codigo,
-    fecha_registro,
-    observaciones
-) VALUES
-    ('BEN-001', '2026-11-01', 'Registro de demostracion'),
-    ('BEN-002', '2026-11-02', NULL);
-
-INSERT INTO ocupaciones (
-    codigo,
-    id_cama,
-    id_beneficiario,
-    fecha_ingreso
-) VALUES
-    ('OCU-001', 1, 1, '2026-11-05 10:00:00');
-
-INSERT INTO comedores (
-    codigo,
-    nombre,
-    direccion,
-    id_refugio
-) VALUES
-    ('COM-001', 'Comedor Esperanza', 'Zona Central, La Paz', 1),
-    ('COM-002', 'Comedor Solidario', 'Zona Sur, La Paz', 2);
-
-INSERT INTO alimentos (
-    codigo,
-    nombre,
-    unidad
-) VALUES
-    ('ALI-001', 'Arroz', 'kg'),
-    ('ALI-002', 'Aceite', 'litros'),
-    ('ALI-003', 'Fideo', 'kg');
-
-INSERT INTO inventarios (
-    codigo,
-    id_comedor,
-    id_alimento,
-    lote,
-    cantidad,
-    fecha_vencimiento
-) VALUES
-    ('INV-001', 1, 1, 'ARR-001', 50.00, '2027-05-01'),
-    ('INV-002', 1, 2, 'ACE-001', 20.00, '2027-06-01');
-
-INSERT INTO donantes (
-    codigo,
-    nombre,
-    tipo,
-    telefono
-) VALUES
-    ('DON-001', 'Donante Ejemplo', 'PERSONA', NULL),
-    ('DON-002', 'Fundacion Ejemplo', 'ORGANIZACION', NULL);
-
-INSERT INTO donaciones (
-    codigo,
-    id_donante,
-    id_comedor,
-    fecha_donacion,
-    observaciones
-) VALUES
-    ('DNA-001', 1, 1, '2026-11-06', 'Donacion de prueba');
-
-INSERT INTO detalle_donaciones (
-    codigo,
-    id_donacion,
-    id_alimento,
-    cantidad,
-    fecha_vencimiento
-) VALUES
-    ('DET-001', 1, 1, 10.00, '2027-05-01'),
-    ('DET-002', 1, 2, 5.00, '2027-06-01');
-
-INSERT INTO raciones (
-    codigo,
-    id_comedor,
-    fecha_entrega,
-    cantidad,
-    observaciones
-) VALUES
-    ('RAC-001', 1, '2026-11-07', 80, 'Entrega de prueba'),
-    ('RAC-002', 2, '2026-11-07', 40, 'Entrega de prueba');
