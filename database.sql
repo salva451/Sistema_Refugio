@@ -4,6 +4,8 @@ CREATE DATABASE IF NOT EXISTS albergue_solidario
 
 USE albergue_solidario;
 
+
+-- ACCESO AL SISTEMA
 CREATE TABLE IF NOT EXISTS usuarios (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
@@ -43,7 +45,6 @@ CREATE TABLE IF NOT EXISTS camas (
     id_habitacion INT NOT NULL,
     estado ENUM('HABILITADA', 'MANTENIMIENTO', 'INACTIVA')
         NOT NULL DEFAULT 'HABILITADA',
-    UNIQUE KEY uq_cama_habitacion (id_habitacion, codigo),
     FOREIGN KEY (id_habitacion)
         REFERENCES habitaciones (id_habitacion)
         ON DELETE RESTRICT
@@ -65,6 +66,9 @@ CREATE TABLE IF NOT EXISTS beneficiarios (
     observaciones VARCHAR(200)
 ) ENGINE = InnoDB;
 
+-- Tabla intermedia (camas N:M beneficiarios).
+-- cama_activa y beneficiario_activo son columnas generadas: valen NULL cuando
+-- la persona ya salio, y asi los UNIQUE impiden dos ocupaciones activas a la vez.
 CREATE TABLE IF NOT EXISTS ocupaciones (
     id_ocupacion INT AUTO_INCREMENT PRIMARY KEY,
     codigo VARCHAR(20) NOT NULL UNIQUE,
@@ -100,6 +104,7 @@ CREATE TABLE IF NOT EXISTS comedores (
         ON DELETE RESTRICT
 ) ENGINE = InnoDB;
 
+-- raciones_por_unidad: cuantas raciones rinde una unidad (p. ej. 1 kg = 10).
 CREATE TABLE IF NOT EXISTS alimentos (
     id_alimento INT AUTO_INCREMENT PRIMARY KEY,
     codigo VARCHAR(20) NOT NULL UNIQUE,
@@ -109,6 +114,7 @@ CREATE TABLE IF NOT EXISTS alimentos (
     CHECK (raciones_por_unidad > 0)
 ) ENGINE = InnoDB;
 
+-- Tabla intermedia (comedores N:M alimentos), uno por lote.
 CREATE TABLE IF NOT EXISTS inventarios (
     id_inventario INT AUTO_INCREMENT PRIMARY KEY,
     codigo VARCHAR(20) NOT NULL UNIQUE,
@@ -156,6 +162,8 @@ CREATE TABLE IF NOT EXISTS detalle_raciones (
         ON DELETE RESTRICT
 ) ENGINE = InnoDB;
 
+
+-- DONACIONES
 CREATE TABLE IF NOT EXISTS donantes (
     id_donante INT AUTO_INCREMENT PRIMARY KEY,
     codigo VARCHAR(20) NOT NULL UNIQUE,
@@ -179,6 +187,7 @@ CREATE TABLE IF NOT EXISTS donaciones (
         ON DELETE RESTRICT
 ) ENGINE = InnoDB;
 
+-- Tabla intermedia (donaciones N:M alimentos).
 CREATE TABLE IF NOT EXISTS detalle_donaciones (
     id_detalle INT AUTO_INCREMENT PRIMARY KEY,
     codigo VARCHAR(20) NOT NULL UNIQUE,
