@@ -9,7 +9,7 @@ def conectar():
             port=3306,
             user="root",
             password="",
-            database="refugio_solidario"
+            database="Sistema_Refugio"
         )
         #Devuelve la variable conexion como verdadero o falso si es que se pudo conectar a la base de datos
         return conexion
