@@ -35,3 +35,11 @@
 - **Tareas del equipo y diseño:** Siguientes pasos para continuar con el desarrollo:
   * Que el equipo termine las demás pantallas y las registre en `main.py`.
   * Corregir detalles del mockup en Canva debido a mejoras vistas en grupo por llamada.
+
+---
+
+## 15 de noviembre de 2026 - Prototipo: Integracion de vista y funcion ´beneficiarios.py´ al menu principal base
+- **Conexión en `main.py` y menú principal:
+  * Se unió el código de la vista de beneficiarios realizado por Cesar con la interfaz principal:
+  * Se enlazó la pantalla de `Beneficiarios` con el menú de navegación en `Principal`.
+  * Se actualizaron las importaciones en `main.py` (`Login`, `Principal`, `Beneficiarios`) y se registró la vista en el diccionario `MODULOS["Beneficiarios"] = Beneficiarios` para que el sistema pueda abrirlo y funcionar.
