@@ -108,6 +108,13 @@ class App(tk.Tk):
             self._crear(nombre, MODULOS[nombre])
         self.mostrar(nombre)
 
+ # Pantalla Beneficiarios
+from Vistas.login import Login
+from Vistas.principal import Principal
+from Vistas.beneficiarios import Beneficiarios     
+
+MODULOS = {}
+MODULOS["Beneficiarios"] = Beneficiarios            
 
 if __name__ == "__main__":
     App().mainloop()
