@@ -28,11 +28,15 @@ class Beneficiarios(tk.Frame):
 
         # Mitad izquierda: formulario para crear o editar
         self.formulario = tk.Frame(contenido, bg="white", padx=10, pady=10)
-        self.formulario.pack(side="left", fill="both", expand=True)
+        self.formulario.grid(row=0, column=0, sticky="nsew")
 
         # Mitad derecha: busqueda y tabla de beneficiarios
         self.lista = tk.Frame(contenido, bg="white", padx=10, pady=10)
-        self.lista.pack(side="left", fill="both", expand=True)
+        self.lista.grid(row=0, column=1, sticky="nsew")
+
+        contenido.grid_rowconfigure(0, weight=1)
+        contenido.grid_columnconfigure(0, weight=1, uniform="mitades")
+        contenido.grid_columnconfigure(1, weight=1, uniform="mitades")
 
         self.crear_formulario()
         self.crear_lista()
@@ -202,10 +206,10 @@ class Beneficiarios(tk.Frame):
         self.tabla.heading("nombre", text="Nombre completo")
         self.tabla.heading("documento", text="Documento")
         self.tabla.heading("estado", text="Estado")
-        self.tabla.column("codigo", width=110)
-        self.tabla.column("nombre", width=220)
-        self.tabla.column("documento", width=130)
-        self.tabla.column("estado", width=100)
+        self.tabla.column("codigo", width=75)
+        self.tabla.column("nombre", width=145)
+        self.tabla.column("documento", width=95)
+        self.tabla.column("estado", width=75)
         self.tabla.pack(fill="both", expand=True)
 
         # Botones que actuan sobre la fila seleccionada

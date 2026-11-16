@@ -1,28 +1,22 @@
-import mysql.connector
-from mysql.connector import Error
-#Conecta la base de datos al programa python
-def conectar():
-    #Intenta conectarse a la base de datos
-    try:
-        conexion = mysql.connector.connect(
-            host="localhost",
-            port=3306,
-            user="root",
-            password="",
-            database="Sistema_Refugio"
-        )
-        #Devuelve la variable conexion como verdadero o falso si es que se pudo conectar a la base de datos
-        return conexion
-#Revisa que no haya errores en la conexion
-    except Error as error:
-        print(f"Error de conexión: {error}")
-        return None
-#avisa si se pudo conectar a la base de datos o no
-if __name__ == "__main__":
-    conexion = conectar()
+"""Unica puerta de entrada a MySQL.
+Todos los archivos de la carpeta Funciones usan conectar() de aqui.
 
-    if conexion is not None:
-        print("Conexión exitosa con MySQL")
-        conexion.close()
-    else:
-        print("No se pudo conectar")
+Cada integrante tiene su propia contrasena de MySQL, por eso los datos reales
+van en config_local.py (que NO se sube a Git). Ver config_ejemplo.py.
+"""
+import mysql.connector
+
+try:
+    from config_local import DB_CONFIG
+except ImportError:
+    DB_CONFIG = {
+        "host": "localhost",
+        "user": "root",
+        "password": "",
+        "database": "albergue_solidario",
+    }
+
+
+def conectar():
+    """Abre y devuelve una conexion nueva. Quien la pide debe cerrarla (con.close())."""
+    return mysql.connector.connect(**DB_CONFIG)
