@@ -49,23 +49,20 @@ from tkinter import messagebox
 
 from Vistas.login import Login
 from Vistas.principal import Principal
-from Vistas.beneficiarios import Beneficiarios
 
 # Pantallas de los modulos (nombre del boton -> clase). Ejemplo para registrar la suya:
 #   from Vistas.beneficiarios import Beneficiarios
 #   MODULOS["Beneficiarios"] = Beneficiarios
-MODULOS = {
-    "Beneficiarios": Beneficiarios,
-}
+MODULOS = {}
 
 
 class App(tk.Tk):
-    ANCHO, ALTO = 1000, 650
+    ANCHO, ALTO = 1200, 650
 
     def __init__(self):
         super().__init__()
         self.title("Sistema de Gestión")
-        self.resizable(False, False)
+        self.resizable(True, True)
         x = (self.winfo_screenwidth() - self.ANCHO) // 2
         y = (self.winfo_screenheight() - self.ALTO) // 2
         self.geometry(f"{self.ANCHO}x{self.ALTO}+{x}+{y}")
@@ -110,6 +107,14 @@ class App(tk.Tk):
         if nombre not in self.pantallas:
             self._crear(nombre, MODULOS[nombre])
         self.mostrar(nombre)
+
+ # Pantalla Beneficiarios
+from Vistas.login import Login
+from Vistas.principal import Principal
+from Vistas.beneficiarios import Beneficiarios     
+
+MODULOS = {}
+MODULOS["Beneficiarios"] = Beneficiarios            
 
 if __name__ == "__main__":
     App().mainloop()
