@@ -112,7 +112,7 @@ class Beneficiarios(tk.Frame):
 
         tk.Label(
             self.formulario,
-            text="Fecha de nacimiento",
+            text="Fecha de nacimiento (dd/mm/aaaa)",
             bg="white"
         ).grid(row=7, column=0, sticky="w", padx=(0, 15))
         tk.Label(self.formulario, text="Teléfono", bg="white").grid(
@@ -120,7 +120,6 @@ class Beneficiarios(tk.Frame):
         )
 
         self.fecha_nacimiento = tk.Entry(self.formulario)
-        self.fecha_nacimiento.insert(0, "dd/mm/aaaa")
         self.fecha_nacimiento.grid(
             row=8, column=0, sticky="ew", padx=(0, 15), pady=(5, 15)
         )
@@ -273,7 +272,6 @@ class Beneficiarios(tk.Frame):
 
         self.tipo_documento.set("Carnet de identidad")
         self.fecha_nacimiento.delete(0, tk.END)
-        self.fecha_nacimiento.insert(0, "dd/mm/aaaa")
         self.observaciones.delete("1.0", tk.END)
         self.beneficiario_editando["id"] = None
         self.boton_guardar.config(text="Guardar")
