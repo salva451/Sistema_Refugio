@@ -5,13 +5,13 @@ from conexion import conectar
 
 # Funcion que guarda un nuevo beneficiario enviado desde la vista
 def guardar_registro(
-    codigo,
     nombres,
     apellido_paterno,
     apellido_materno,
     tipo_documento,
     numero_documento,
     fecha_nacimiento,
+    tipo_beneficiario,
     telefono,
     direccion,
     observaciones
@@ -28,6 +28,16 @@ def guardar_registro(
     # Intenta ejecutar el INSERT en la base de datos
     try:
         cursor = conexion.cursor()
+        cursor.execute("""
+            SELECT COALESCE(
+                MAX(CAST(SUBSTRING(codigo, 3) AS UNSIGNED)),
+                0
+            )
+            FROM beneficiarios
+            WHERE codigo LIKE 'B-%'
+        """)
+        siguiente = int(cursor.fetchone()[0]) + 1
+        codigo = f"B-{siguiente:04d}"
         query = """
             INSERT IGNORE INTO beneficiarios (
                 codigo,
@@ -37,11 +47,12 @@ def guardar_registro(
                 tipo_documento,
                 numero_documento,
                 fecha_nacimiento,
+                tipo_beneficiario,
                 telefono,
                 direccion,
                 observaciones
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         cursor.execute(
             query,
@@ -53,6 +64,7 @@ def guardar_registro(
                 tipo_documento,
                 numero_documento,
                 fecha_nacimiento,
+                tipo_beneficiario,
                 telefono,
                 direccion,
                 observaciones
@@ -101,10 +113,11 @@ def obtener_beneficiarios(busqueda=""):
                OR apellido_paterno LIKE %s
                OR apellido_materno LIKE %s
                OR numero_documento LIKE %s
+               OR codigo LIKE %s
             ORDER BY id_beneficiario DESC
         """
         texto = f"%{busqueda}%"
-        cursor.execute(query, (texto, texto, texto, texto))
+        cursor.execute(query, (texto, texto, texto, texto, texto))
         return True, cursor.fetchall()
 
     # Devuelve el error para que la vista pueda informarlo
@@ -139,6 +152,7 @@ def obtener_beneficiario(id_beneficiario):
                 tipo_documento,
                 numero_documento,
                 fecha_nacimiento,
+                tipo_beneficiario,
                 telefono,
                 direccion,
                 observaciones
@@ -167,13 +181,13 @@ def obtener_beneficiario(id_beneficiario):
 # Funcion que actualiza los datos del beneficiario seleccionado
 def actualizar_beneficiario(
     id_beneficiario,
-    codigo,
     nombres,
     apellido_paterno,
     apellido_materno,
     tipo_documento,
     numero_documento,
     fecha_nacimiento,
+    tipo_beneficiario,
     telefono,
     direccion,
     observaciones
@@ -189,13 +203,13 @@ def actualizar_beneficiario(
         cursor = conexion.cursor()
         query = """
             UPDATE beneficiarios
-            SET codigo = %s,
-                nombres = %s,
+            SET nombres = %s,
                 apellido_paterno = %s,
                 apellido_materno = %s,
                 tipo_documento = %s,
                 numero_documento = %s,
                 fecha_nacimiento = %s,
+                tipo_beneficiario = %s,
                 telefono = %s,
                 direccion = %s,
                 observaciones = %s
@@ -204,13 +218,13 @@ def actualizar_beneficiario(
         cursor.execute(
             query,
             (
-                codigo,
                 nombres,
                 apellido_paterno,
                 apellido_materno,
                 tipo_documento,
                 numero_documento,
                 fecha_nacimiento,
+                tipo_beneficiario,
                 telefono,
                 direccion,
                 observaciones,
@@ -258,6 +272,30 @@ def retirar_beneficiario(id_beneficiario):
         return False, str(error)
 
     # Cierra los recursos despues de actualizar
+    finally:
+        if cursor is not None:
+            cursor.close()
+        conexion.close()
+
+
+# Cambia el estado a ACTIVO para mantener un registro retirado y volver a usarlo
+def reactivar_beneficiario(id_beneficiario):
+    conexion = conectar()
+    cursor = None
+    if conexion is None:
+        return False, "No se pudo conectar con MySQL."
+    try:
+        cursor = conexion.cursor()
+        cursor.execute("""
+            UPDATE beneficiarios
+            SET estado = 'ACTIVO'
+            WHERE id_beneficiario = %s
+        """, (id_beneficiario,))
+        conexion.commit()
+        return True, None
+    except Error as error:
+        conexion.rollback()
+        return False, str(error)
     finally:
         if cursor is not None:
             cursor.close()

@@ -49,15 +49,22 @@ from tkinter import messagebox
 
 from Vistas.login import Login
 from Vistas.principal import Principal
+from Vistas.beneficiarios import Beneficiarios
+from Vistas.habitaciones import HabitacionesCamas
+from Vistas.ocupaciones import Ocupaciones
 
 # Pantallas de los modulos (nombre del boton -> clase). Ejemplo para registrar la suya:
 #   from Vistas.beneficiarios import Beneficiarios
 #   MODULOS["Beneficiarios"] = Beneficiarios
-MODULOS = {}
+MODULOS = {
+    "Beneficiarios": Beneficiarios,
+    "Habitaciones y camas": HabitacionesCamas,
+    "Ocupación": Ocupaciones,
+}
 
 
 class App(tk.Tk):
-    ANCHO, ALTO = 1200, 650
+    ANCHO, ALTO = 1200, 800
 
     def __init__(self):
         super().__init__()

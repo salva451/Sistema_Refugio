@@ -1,5 +1,6 @@
 """Menu principal. Solo dibuja; los numeros vienen de obtener_datos()."""
 import tkinter as tk
+from Funciones.ocupaciones import cupos
 
 MODULOS = ["Beneficiarios", "Habitaciones y camas", "Ocupación", "Inventario",
            "Donaciones", "Raciones", "Reportes"]
@@ -130,11 +131,12 @@ class Principal(tk.Frame):
         Si la base de datos falla, envolver el bloque en try/except mysql.connector.Error
         y mostrar los valores en 0 o un messagebox.
         """
+        cupos_camas = cupos()
         return {
-            "capacidad_maxima": 0,
-            "total_camas": 0,
-            "camas_ocupadas": 0,
-            "camas_disponibles": 0,
+            "capacidad_maxima": cupos_camas["capacidad_maxima"],
+            "total_camas": cupos_camas["total_camas"],
+            "camas_ocupadas": cupos_camas["camas_ocupadas"],
+            "camas_disponibles": cupos_camas["camas_disponibles"],
             "por_vencer": 0,
             "raciones_hoy": 0,
         }

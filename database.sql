@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS beneficiarios (
     tipo_documento VARCHAR(30) NOT NULL DEFAULT 'CARNET DE IDENTIDAD',
     numero_documento VARCHAR(40) NOT NULL UNIQUE,
     fecha_nacimiento DATE,
+    tipo_beneficiario ENUM('ALOJADO', 'EXTERNO') NOT NULL DEFAULT 'EXTERNO',
     telefono VARCHAR(25),
     direccion VARCHAR(200),
     fecha_registro DATE NOT NULL DEFAULT (CURRENT_DATE),

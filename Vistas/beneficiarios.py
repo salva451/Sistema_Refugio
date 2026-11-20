@@ -9,6 +9,7 @@ from Funciones.beneficiarios import (
     guardar_registro,
     obtener_beneficiario,
     obtener_beneficiarios,
+    reactivar_beneficiario,
     retirar_beneficiario,
 )
 
@@ -53,6 +54,12 @@ class Beneficiarios(tk.Frame):
             bg="white",
             font=("Arial", 20, "bold")
         ).grid(row=0, column=0, columnspan=2, sticky="w", pady=(0, 25))
+        tk.Label(
+            self.formulario,
+            text="* Campo obligatorio",
+            bg="white",
+            fg="#555555"
+        ).grid(row=0, column=1, sticky="e", pady=(0, 25))
 
         tk.Label(self.formulario, text="Código", bg="white").grid(
             row=1, column=0, sticky="w", padx=(0, 15)
@@ -62,6 +69,7 @@ class Beneficiarios(tk.Frame):
         )
 
         self.codigo = tk.Entry(self.formulario)
+        self.codigo.config(state="readonly")
         self.codigo.grid(
             row=2, column=0, sticky="ew", padx=(0, 15), pady=(5, 15)
         )
@@ -86,7 +94,7 @@ class Beneficiarios(tk.Frame):
             row=4, column=1, sticky="ew", pady=(5, 15)
         )
 
-        tk.Label(self.formulario, text="Tipo de documento", bg="white").grid(
+        tk.Label(self.formulario, text="Tipo de documento*", bg="white").grid(
             row=5, column=0, sticky="w", padx=(0, 15)
         )
         tk.Label(
@@ -127,13 +135,23 @@ class Beneficiarios(tk.Frame):
         self.telefono = tk.Entry(self.formulario)
         self.telefono.grid(row=8, column=1, sticky="ew", pady=(5, 15))
 
-        tk.Label(self.formulario, text="Dirección", bg="white").grid(
-            row=9, column=0, columnspan=2, sticky="w"
+        tk.Label(
+            self.formulario,
+            text="Tipo de beneficiario*",
+            bg="white"
+        ).grid(row=9, column=0, sticky="w", padx=(0, 15))
+
+        self.tipo_beneficiario = ttk.Combobox(
+            self.formulario,
+            values=("ALOJADO", "EXTERNO"),
+            state="readonly"
         )
+        self.tipo_beneficiario.set("EXTERNO")
+        self.tipo_beneficiario.grid(
+            row=10, column=0, sticky="ew", padx=(0, 15), pady=(5, 15)
+        )
+        # La direccion queda fuera del formulario actual porque no es obligatoria
         self.direccion = tk.Entry(self.formulario)
-        self.direccion.grid(
-            row=10, column=0, columnspan=2, sticky="ew", pady=(5, 15)
-        )
 
         tk.Label(self.formulario, text="Observaciones", bg="white").grid(
             row=11, column=0, columnspan=2, sticky="w"
@@ -227,6 +245,14 @@ class Beneficiarios(tk.Frame):
             pady=8
         ).grid(row=0, column=1, padx=(15, 0))
 
+        tk.Button(
+            botones_lista,
+            text="Reactivar",
+            command=self.reactivar_seleccionado,
+            padx=20,
+            pady=8
+        ).grid(row=0, column=2, padx=(15, 0))
+
     # Se llama cada vez que App muestra esta pantalla
     def al_mostrar(self):
         self.cargar_lista()
@@ -241,26 +267,30 @@ class Beneficiarios(tk.Frame):
     # Obtiene el contenido actual de todas las cajas del formulario
     def obtener_datos_formulario(self):
         return (
-            self.codigo.get().strip(),
             self.nombres.get().strip(),
             self.apellido_paterno.get().strip(),
             self.apellido_materno.get().strip(),
             self.tipo_documento.get().strip(),
             self.numero_documento.get().strip(),
             self.fecha_nacimiento.get().strip(),
+            self.tipo_beneficiario.get().strip(),
             self.telefono.get().strip(),
             self.direccion.get().strip(),
             self.observaciones.get("1.0", tk.END).strip()
         )
 
-    # Todos los campos son obligatorios excepto observaciones
+    # Valida los campos principales necesarios para prestar el servicio
     def formulario_valido(self, datos):
-        return all(datos[:-1]) and datos[6] != "dd/mm/aaaa"
+        return (
+            bool(datos[0])
+            and bool(datos[1])
+            and bool(datos[4])
+            and bool(datos[6])
+        )
 
     # Limpia el formulario y lo prepara para un nuevo registro
     def limpiar_formulario(self):
         for campo in (
-            self.codigo,
             self.nombres,
             self.apellido_paterno,
             self.apellido_materno,
@@ -270,7 +300,12 @@ class Beneficiarios(tk.Frame):
         ):
             campo.delete(0, tk.END)
 
+        self.codigo.config(state="normal")
+        self.codigo.delete(0, tk.END)
+        self.codigo.insert(0, "Se genera al guardar")
+        self.codigo.config(state="readonly")
         self.tipo_documento.set("Carnet de identidad")
+        self.tipo_beneficiario.set("EXTERNO")
         self.fecha_nacimiento.delete(0, tk.END)
         self.observaciones.delete("1.0", tk.END)
         self.beneficiario_editando["id"] = None
@@ -330,6 +365,7 @@ class Beneficiarios(tk.Frame):
             valor_tipo_documento,
             valor_numero_documento,
             valor_fecha_nacimiento,
+            valor_tipo_beneficiario,
             valor_telefono,
             valor_direccion,
             valor_observaciones
@@ -337,12 +373,15 @@ class Beneficiarios(tk.Frame):
 
         self.limpiar_formulario()
         self.beneficiario_editando["id"] = id_beneficiario
+        self.codigo.config(state="normal")
         self.codigo.insert(0, valor_codigo)
+        self.codigo.config(state="readonly")
         self.nombres.insert(0, valor_nombres)
         self.apellido_paterno.insert(0, valor_apellido_paterno)
         self.apellido_materno.insert(0, valor_apellido_materno or "")
         self.tipo_documento.set(valor_tipo_documento)
         self.numero_documento.insert(0, valor_numero_documento)
+        self.tipo_beneficiario.set(valor_tipo_beneficiario)
         self.fecha_nacimiento.delete(0, tk.END)
         self.fecha_nacimiento.insert(
             0,
@@ -382,6 +421,30 @@ class Beneficiarios(tk.Frame):
         else:
             messagebox.showerror("Error", error)
 
+    # Reactiva un registro retirado sin crear una persona nueva
+    def reactivar_seleccionado(self):
+        seleccion = self.tabla.selection()
+        if not seleccion:
+            messagebox.showwarning(
+                "Selección necesaria",
+                "Selecciona un beneficiario de la tabla."
+            )
+            return
+
+        confirmar = messagebox.askyesno(
+            "Confirmar reactivación",
+            "¿Quieres volver a activar este beneficiario?"
+        )
+        if not confirmar:
+            return
+
+        correcto, error = reactivar_beneficiario(int(seleccion[0]))
+        if correcto:
+            messagebox.showinfo("Éxito", "Beneficiario reactivado.")
+            self.cargar_lista()
+        else:
+            messagebox.showerror("Error", error)
+
     # Guarda un registro nuevo o actualiza el registro en edicion
     def guardar_desde_formulario(self):
         datos = self.obtener_datos_formulario()
@@ -389,20 +452,53 @@ class Beneficiarios(tk.Frame):
         if not self.formulario_valido(datos):
             messagebox.showwarning(
                 "Campos vacíos",
-                "Completa todos los campos excepto observaciones."
+                "Completa nombres, apellido paterno, número de documento y tipo de beneficiario."
             )
             return
 
-        try:
-            fecha = datetime.strptime(datos[6], "%d/%m/%Y").date()
-        except ValueError:
+        if datos[3] == "Carnet de identidad" and (
+            not datos[4].isdigit()
+            or len(datos[4]) < 5
+            or len(datos[4]) > 15
+        ):
             messagebox.showwarning(
-                "Fecha inválida",
-                "Usa el formato dd/mm/aaaa."
+                "Documento inválido",
+                "El carnet debe tener entre 5 y 15 números."
             )
             return
 
-        datos = datos[:6] + (fecha,) + datos[7:]
+        if datos[7] and (not datos[7].isdigit() or len(datos[7]) < 7):
+            messagebox.showwarning(
+                "Teléfono inválido",
+                "Ingresa un teléfono con al menos 7 números."
+            )
+            return
+
+        fecha = None
+        if datos[5]:
+            if len(datos[5]) != 10:
+                messagebox.showwarning(
+                    "Fecha inválida",
+                    "La fecha debe tener 10 caracteres: dd/mm/aaaa."
+                )
+                return
+            try:
+                fecha = datetime.strptime(datos[5], "%d/%m/%Y").date()
+            except ValueError:
+                messagebox.showwarning(
+                    "Fecha inválida",
+                    "Usa una fecha real con formato dd/mm/aaaa."
+                )
+                return
+
+            if fecha > datetime.now().date():
+                messagebox.showwarning(
+                    "Fecha inválida",
+                    "La fecha de nacimiento no puede ser futura."
+                )
+                return
+
+        datos = datos[:5] + (fecha,) + datos[6:]
 
         if self.beneficiario_editando["id"] is None:
             guardado, error = guardar_registro(*datos)
