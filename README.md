@@ -44,7 +44,7 @@ Puedes descargar el proyecto de dos maneras:
   1. Si no tienes Git, descárgalo desde [git-scm.com](https://git-scm.com/) e instálalo dejando las opciones por defecto.
   2. Abre la terminal (CMD o PowerShell), ubícate en la carpeta donde guardarás el proyecto y ejecuta:
      ```bash
-     git clone https://github.com/salva541/Sistema_Refugio
+     git clone https://github.com/salva541/Sistema_Refugio.git
      ```
   3. Entra a la carpeta del proyecto:
      ```bash
