@@ -1,3 +1,19 @@
+# 10 de noviembre de 2026 — Creación de la base de datos y ordenamiento de archivos posibles a utilizar
+
+### Base de Datos y Organización Inicial
+- **Diseño inicial de la base de datos:** Se creó el script inicial con la estructura de tablas en MySQL 8.0 para gestionar refugios, personas e inventario.
+- **Ordenamiento de archivos:** Se clasificaron y organizaron en local los archivos base y recursos que se utilizarían para levantar el proyecto.
+
+---
+
+## 11 de noviembre de 2026 — Inicio de proyecto en GitHub y conexión a MySQL
+
+### Configuración del Entorno y Repositorio
+- **Inicio de proyecto (`salva541`):** Se inicializó el repositorio en GitHub subiendo la estructura base para el trabajo colaborativo del equipo.
+- **Conexión a MySQL:** Se configuró e implementó el enlace entre Python y la base de datos local en MySQL mediante el conector correspondiente, verificando la comunicación exitosa.
+
+---
+
 ## 13 de noviembre de 2026 — Cambios en la Base de Datos y el Archivo README
 
 ### Cambios en los nombres de la Base de Datos
@@ -14,6 +30,9 @@
 - **Control de raciones entregadas (`detalle_raciones`):**
   * Se volvió a poner la tabla `detalle_raciones`, ya que es necesaria para que el inventario no solo suba con las donaciones, sino que baje bien cuando se entrega comida. Sin ella se pierde el control de los lotes y no se pueden cumplir los objetivos de evitar desperdicios ni respaldar los reportes de consumo.
 
+### Adaptación e Interfaz
+- **Ajustes y adaptación:** Se realizaron ajustes en los nombres de archivos y se adaptó la estructura inicial de la interfaz del refugio a los cambios de la base de datos.
+
 ### Actualización de Documentación
 - **`README.md`:** Se agregó una tabla con los nombres de los integrantes, sus usuarios de GitHub y los roles que cumple cada uno en el grupo.
 
@@ -24,7 +43,7 @@
 ### Prototipo
 - **Definición del diseño y arquitectura:** Se estructuró la base visual y organizativa del proyecto:
   * Se definió el mockup con todas las pantallas y sus reglas, para tener una base del mockup en Canvas.
-  * Se definió la estructura del proyecto: `Funciones/` (consultas), `Vistas/` (ventanas), `conexion.py` y `main.py`.
+  * Se definió y actualizó la estructura de carpetas del proyecto: `Funciones/` (consultas), `Vistas/` (ventanas), `conexion.py` y `main.py`, aplicando también pequeños ajustes a la base de datos.
 - **Interfaces desarrolladas en Tkinter:** Se implementaron las vistas iniciales del sistema:
   * Login en Tkinter con bloqueo de 3 minutos tras 3 intentos fallidos (código listo, en pruebas).
   * Menú principal en Tkinter con las camas (total, ocupadas y disponibles) en un solo recuadro (por ahora los datos muestran 0).
@@ -38,8 +57,55 @@
 
 ---
 
-## 15 de noviembre de 2026 - Prototipo: Integracion de vista y funcion ´beneficiarios.py´ al menu principal base
-- **Conexión en `main.py` y menú principal:
-  * Se unió el código de la vista de beneficiarios realizado por Cesar con la interfaz principal:
+## 15 de noviembre de 2026 - Prototipo: Integracion de vista y funcion `beneficiarios.py` al menu principal base
+
+### Módulo de Beneficiarios (Funciones y Vistas)
+- **Desarrollo y pruebas de `Beneficiarios`:** Se implementaron y probaron las funciones y vistas para ingresar, consultar y revisar registros de beneficiarios directamente en la base de datos.
+- **Adaptación visual:** Se actualizó la vista de `Beneficiarios` adaptándola al diseño de las ventanas principales (`Login` y `Panel`), dejando funcional el subprograma de registro y revisión.
+
+### Conexión en `main.py` y menú principal
+- **Integración:** Se unió el código de la vista de beneficiarios realizado por Cesar con la interfaz principal:
   * Se enlazó la pantalla de `Beneficiarios` con el menú de navegación en `Principal`.
   * Se actualizaron las importaciones en `main.py` (`Login`, `Principal`, `Beneficiarios`) y se registró la vista en el diccionario `MODULOS["Beneficiarios"] = Beneficiarios` para que el sistema pueda abrirlo y funcionar.
+
+---
+
+## 16 de noviembre de 2026 — Integración de ramas y pruebas funcionales de las primeras 3 pantallas
+
+### Fusión y Pruebas del Sistema Base
+- **Anexión de ramas:** Se integraron los avances de las ramas `pedro` y `cesar` unificando `Login`, `Panel` y `Beneficiarios` en un solo flujo funcional.
+- **Prueba de conexión integral:** Se validó con éxito la comunicación entre el inicio de sesión, el panel principal y el módulo de beneficiarios con la base de datos activa, consolidando las primeras 3 pantallas funcionales.
+- **Ajustes visuales:** Se realizaron mejoras menores en el menú de registro de beneficiarios y se estandarizó la configuración de tamaño general de las ventanas de la aplicación.
+
+---
+
+## 19 de noviembre de 2026 — Reorganización de la base de datos en el repositorio y guía en README
+
+### Estructura y Documentación
+- **Carpeta `base_de_datos/`:** Se creó el directorio `base_de_datos` en el repositorio y se movió allí el archivo SQL principal para mantener separado el código fuente de los scripts de datos.
+- **Actualización de `README.md`:** Se corrigió el nombre del proyecto y se añadió una guía de instalación detallada para facilitar la ejecución local.
+
+---
+
+## 20 de noviembre de 2026 — Módulo de Habitaciones y Camas, Ocupación y corrección de validaciones
+
+### Nuevas Funcionalidades y Validaciones
+- **Habitaciones, Camas y Ocupación:** Se creó y dejó completamente funcional el contenido del botón `Habitaciones y Camas` junto con el control de `Ocupación` conectado a la base de datos.
+- **Corrección de errores y validaciones:** Se corrigieron observaciones y errores de validación en los formularios (como las restricciones de longitud mínima de caracteres en nombres y apellidos) y se aplicaron mejoras generales en `Beneficiarios`.
+- **Documentación:** Se hicieron ajustes adicionales en el `README.md` para mayor claridad.
+
+---
+
+## 22 de noviembre de 2026 — Ajustes finales en documentación
+
+### Documentación
+- **`README.md`:** Se realizaron pequeñas correcciones de formato y redacción en el archivo principal del repositorio.
+
+---
+
+## 25 de noviembre de 2026 — Consolidación del programa preliminar y fusión de rama `cesar`
+
+### Integración y Pruebas Preliminares
+- **Fusión de cambios (`Merge branch 'cesar'`):** Se integraron las últimas actualizaciones desarrolladas en la rama `cesar` hacia la rama principal.
+- **Programa preliminar funcional:** Se realizaron pruebas del sistema de refugios a través de distintas ramas verificando que los módulos conectados funcionen de manera estable.
+- **Soporte de base de datos:** Se incorporó un archivo temporal de prueba para agilizar la actualización y testeo de la base de datos.
