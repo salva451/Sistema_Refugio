@@ -79,9 +79,7 @@ Puedes descargar el proyecto de dos maneras:
 
 ### 5. Configurar la conexión del sistema
 
-1. Dentro de la carpeta principal del proyecto, busca el archivo `config_ejemplo.py`.
-2. Haz una copia de ese archivo en la misma carpeta y cámbiale el nombre a `config_local.py`.
-3. Abre `config_local.py` con el Bloc de notas o tu editor de código y verifica que la configuración coincida con tu instalación de XAMPP (por defecto en XAMPP la contraseña de `root` va vacía `""`):
+1. Abre `config_local.py` con el Bloc de notas o tu editor de código y verifica que la configuración coincida con tu instalación de XAMPP (por defecto en XAMPP la contraseña de `root` va vacía `""`):
    ```python
    DB_CONFIG = {
        "host": "localhost",

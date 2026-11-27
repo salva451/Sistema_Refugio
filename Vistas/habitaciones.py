@@ -155,7 +155,6 @@ class HabitacionesCamas(tk.Frame):
             return
         correcto, resultado = crear_habitacion(numero, descripcion)
         if correcto:
-            messagebox.showinfo("Éxito", "Habitación creada correctamente.")
             self.numero_habitacion.delete(0, tk.END)
             self.descripcion_habitacion.delete(0, tk.END)
             self.cargar_habitaciones()
@@ -174,7 +173,6 @@ class HabitacionesCamas(tk.Frame):
             return
         correcto, resultado = crear_cama(self.id_habitacion)
         if correcto:
-            messagebox.showinfo("Éxito", f"Cama creada: {resultado}")
             self.cargar_camas()
             self.cargar_habitaciones()
             self.lista_habitaciones.selection_set(str(self.id_habitacion))

@@ -12,7 +12,7 @@ except ImportError:
     DB_CONFIG = {
         "host": "localhost",
         "user": "root",
-        "password": "",
+        "password": "loschicolac123",
         "database": "albergue_solidario",
     }
 

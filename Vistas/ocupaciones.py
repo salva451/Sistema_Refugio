@@ -221,7 +221,6 @@ class Ocupaciones(tk.Frame):
             self.camas_datos[etiqueta_cama]
         )
         if correcto:
-            messagebox.showinfo("Éxito", "Cama asignada correctamente.")
             self.cargar()
         else:
             messagebox.showerror("Error", resultado)

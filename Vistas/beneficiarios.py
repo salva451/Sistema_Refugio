@@ -3,6 +3,9 @@ from datetime import datetime
 import tkinter as tk
 from tkinter import messagebox, ttk
 
+from Funciones.validaciones import validar_documento, validar_fecha_nacimiento
+from Vistas.componentes import formato_fecha
+
 # Importa las funciones necesarias para que la vista trabaje con MySQL
 from Funciones.beneficiarios import (
     actualizar_beneficiario,
@@ -127,7 +130,7 @@ class Beneficiarios(tk.Frame):
             row=7, column=1, sticky="w"
         )
 
-        self.fecha_nacimiento = tk.Entry(self.formulario)
+        self.fecha_nacimiento = formato_fecha(tk.Entry(self.formulario))
         self.fecha_nacimiento.grid(
             row=8, column=0, sticky="ew", padx=(0, 15), pady=(5, 15)
         )
@@ -135,21 +138,15 @@ class Beneficiarios(tk.Frame):
         self.telefono = tk.Entry(self.formulario)
         self.telefono.grid(row=8, column=1, sticky="ew", pady=(5, 15))
 
-        tk.Label(
-            self.formulario,
-            text="Tipo de beneficiario*",
-            bg="white"
-        ).grid(row=9, column=0, sticky="w", padx=(0, 15))
-
+        # Solo se registran personas ALOJADAS: los externos (servicios anonimos del comedor)
+        # ya no se registran aqui, se cuentan en la pantalla de Raciones.
+        # El campo se mantiene OCULTO (no se dibuja) para no cambiar el resto del codigo.
         self.tipo_beneficiario = ttk.Combobox(
             self.formulario,
-            values=("ALOJADO", "EXTERNO"),
+            values=("ALOJADO",),
             state="readonly"
         )
-        self.tipo_beneficiario.set("EXTERNO")
-        self.tipo_beneficiario.grid(
-            row=10, column=0, sticky="ew", padx=(0, 15), pady=(5, 15)
-        )
+        self.tipo_beneficiario.set("ALOJADO")
         # La direccion queda fuera del formulario actual porque no es obligatoria
         self.direccion = tk.Entry(self.formulario)
 
@@ -305,7 +302,7 @@ class Beneficiarios(tk.Frame):
         self.codigo.insert(0, "Se genera al guardar")
         self.codigo.config(state="readonly")
         self.tipo_documento.set("Carnet de identidad")
-        self.tipo_beneficiario.set("EXTERNO")
+        self.tipo_beneficiario.set("ALOJADO")
         self.fecha_nacimiento.delete(0, tk.END)
         self.observaciones.delete("1.0", tk.END)
         self.beneficiario_editando["id"] = None
@@ -452,20 +449,15 @@ class Beneficiarios(tk.Frame):
         if not self.formulario_valido(datos):
             messagebox.showwarning(
                 "Campos vacíos",
-                "Completa nombres, apellido paterno, número de documento y tipo de beneficiario."
+                "Completa nombres, apellido paterno y número de documento."
             )
             return
 
-        if datos[3] == "Carnet de identidad" and (
-            not datos[4].isdigit()
-            or len(datos[4]) < 5
-            or len(datos[4]) > 15
-        ):
-            messagebox.showwarning(
-                "Documento inválido",
-                "El carnet debe tener entre 5 y 15 números."
-            )
+        documento_ok, documento = validar_documento(datos[3], datos[4])
+        if not documento_ok:
+            messagebox.showwarning("Documento inválido", documento)
             return
+        datos = datos[:4] + (documento,) + datos[5:]
 
         if datos[7] and (not datos[7].isdigit() or len(datos[7]) < 7):
             messagebox.showwarning(
@@ -474,31 +466,14 @@ class Beneficiarios(tk.Frame):
             )
             return
 
-        fecha = None
-        if datos[5]:
-            if len(datos[5]) != 10:
-                messagebox.showwarning(
-                    "Fecha inválida",
-                    "La fecha debe tener 10 caracteres: dd/mm/aaaa."
-                )
-                return
-            try:
-                fecha = datetime.strptime(datos[5], "%d/%m/%Y").date()
-            except ValueError:
-                messagebox.showwarning(
-                    "Fecha inválida",
-                    "Usa una fecha real con formato dd/mm/aaaa."
-                )
-                return
-
-            if fecha > datetime.now().date():
-                messagebox.showwarning(
-                    "Fecha inválida",
-                    "La fecha de nacimiento no puede ser futura."
-                )
-                return
+        fecha_ok, fecha = validar_fecha_nacimiento(datos[5])
+        if not fecha_ok:
+            messagebox.showwarning("Fecha inválida", fecha)
+            return
 
         datos = datos[:5] + (fecha,) + datos[6:]
+
+        era_edicion = self.beneficiario_editando["id"] is not None
 
         if self.beneficiario_editando["id"] is None:
             guardado, error = guardar_registro(*datos)
@@ -509,7 +484,8 @@ class Beneficiarios(tk.Frame):
             )
 
         if guardado:
-            messagebox.showinfo("Éxito", "Datos guardados correctamente.")
+            if era_edicion:       # al crear no se muestra aviso: se limpia y la tabla se actualiza
+                messagebox.showinfo("Éxito", "Datos actualizados correctamente.")
             self.limpiar_formulario()
             self.cargar_lista()
         else:

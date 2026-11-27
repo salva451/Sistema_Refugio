@@ -21,11 +21,7 @@ Vistas/principal.py). App cambia de pantalla con  mostrar("NombreDeLaPantalla").
             def al_mostrar(self):      # opcional: se ejecuta cada vez que se abre
                 pass                   # aqui recargar la tabla desde la base
 
- 2. Registrarla AQUI, en el diccionario MODULOS, con DOS lineas:
-
-        from Vistas.beneficiarios import Beneficiarios
-        MODULOS["Beneficiarios"] = Beneficiarios
-
+ 2. Registrarla AQUI, en el diccionario MODULOS (una linea mas + su import).
     El texto entre comillas debe ser IGUAL al del boton del menu
     (ver la lista MODULOS en Vistas/principal.py: con tildes y mayusculas).
     Mientras un modulo no este registrado, su boton muestra "En construccion".
@@ -37,11 +33,9 @@ Vistas/principal.py). App cambia de pantalla con  mostrar("NombreDeLaPantalla").
     controlador.mostrar("Principal")   -> volver al menu
     controlador.usuario                -> {"id":..., "nombre":..., "rol":...} de quien inicio sesion
 
---- DATOS DEL MENU PRINCIPAL ---
- Los numeros del menu (camas, alimentos por vencer, raciones de hoy) estan en 0.
- Se conectan en Vistas/principal.py, metodo obtener_datos(): ahi hay comentado el
- codigo exacto y lo que debe devolver cada funcion de Funciones/. No hace falta
- tocar main.py para eso.
+--- MODULOS SOLO PARA ADMINISTRADOR ---
+ Los nombres que esten en SOLO_ADMIN (mas abajo) solo se abren si el usuario que
+ inicio sesion tiene el rol ADMINISTRADOR.
 ==================================================================
 """
 import tkinter as tk
@@ -52,15 +46,26 @@ from Vistas.principal import Principal
 from Vistas.beneficiarios import Beneficiarios
 from Vistas.habitaciones import HabitacionesCamas
 from Vistas.ocupaciones import Ocupaciones
+from Vistas.inventario import Inventario
+from Vistas.donaciones import Donaciones          # pantalla "Ingreso de alimentos" (donacion o compra)
+from Vistas.raciones import Raciones
+from Vistas.reportes import Reportes
+from Vistas.usuarios import Usuarios
 
-# Pantallas de los modulos (nombre del boton -> clase). Ejemplo para registrar la suya:
-#   from Vistas.beneficiarios import Beneficiarios
-#   MODULOS["Beneficiarios"] = Beneficiarios
+# Pantallas de los modulos (nombre del boton -> clase). UN SOLO registro.
 MODULOS = {
     "Beneficiarios": Beneficiarios,
     "Habitaciones y camas": HabitacionesCamas,
     "Ocupación": Ocupaciones,
+    "Inventario": Inventario,
+    "Donaciones": Donaciones,
+    "Raciones": Raciones,
+    "Reportes": Reportes,
+    "Usuarios": Usuarios,
 }
+
+# Modulos que solo puede abrir el administrador.
+SOLO_ADMIN = ("Reportes", "Usuarios")
 
 
 class App(tk.Tk):
@@ -111,21 +116,14 @@ class App(tk.Tk):
         if nombre not in MODULOS:
             messagebox.showinfo("En construcción", f"El módulo «{nombre}» todavía no está listo.")
             return
+        rol = (self.usuario or {}).get("rol")
+        if nombre in SOLO_ADMIN and rol != "ADMINISTRADOR":
+            messagebox.showwarning("Acceso restringido", "Solo el administrador puede entrar a este módulo.")
+            return
         if nombre not in self.pantallas:
             self._crear(nombre, MODULOS[nombre])
         self.mostrar(nombre)
 
- # Pantalla Beneficiarios y otros
-from Vistas.login import Login
-from Vistas.principal import Principal
-from Vistas.beneficiarios import Beneficiarios
-from Vistas.habitaciones import HabitacionesCamas
-from Vistas.ocupaciones import Ocupaciones
-
-MODULOS = {}
-MODULOS["Beneficiarios"] = Beneficiarios
-MODULOS["Habitaciones y camas"] = HabitacionesCamas
-MODULOS["Ocupación"] = Ocupaciones
 
 if __name__ == "__main__":
     App().mainloop()
