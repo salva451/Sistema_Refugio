@@ -1,4 +1,4 @@
-## 10 de noviembre de 2026 — Creación de la base de datos y ordenamiento de archivos posibles a utilizar *(Cesar Sumi)*
+## 10 de noviembre de 2026 — Creación de la base de datos y ordenamiento de archivos posibles a utilizar
 
 ### Base de Datos y Organización Inicial
 - **Diseño inicial de la base de datos:** Se creó el script inicial con la estructura de tablas en MySQL 8.0 para gestionar refugios, personas e inventario.
@@ -6,7 +6,7 @@
 
 ---
 
-## 11 de noviembre de 2026 — Inicio de proyecto en GitHub y conexión a MySQL *(Cesar Sumi)*
+## 11 de noviembre de 2026 — Inicio de proyecto en GitHub y conexión a MySQL
 
 ### Configuración del Entorno y Repositorio
 - **Inicio de proyecto (`salva541`):** Se inicializó el repositorio en GitHub subiendo la estructura base para el trabajo colaborativo del equipo.
@@ -14,7 +14,7 @@
 
 ---
 
-## 12 de noviembre de 2026 — Carga inicial de archivos al repositorio *(Ailin Cabaza)*
+## 12 de noviembre de 2026 — Carga inicial de archivos al repositorio
 
 ### Documentación y Estructura
 - **Subida de archivos iniciales:** Se cargaron los primeros archivos de documentación y base al repositorio del proyecto.
@@ -24,7 +24,7 @@
 ## 13 de noviembre de 2026 — Cambios en la Base de Datos y el Archivo README *(Cesar Sumi / Pedro Efrain Rada / Ailin Cabaza)*
 
 ### Cambios en los nombres de la Base de Datos
-- **Unificación del nombre "Albergue" *(Cesar Sumi / Pedro Efrain Rada)*:** Se actualizaron las tablas y se corrigieron plurales en `database.sql` para que tengan coherencia en todo el proyecto:
+- **Unificación del nombre "Albergue" :** Se actualizaron las tablas y se corrigieron plurales en `database.sql` para que tengan coherencia en todo el proyecto:
   * La base de datos ahora se llama `albergue_solidario`.
   * La tabla `refugio` pasó a llamarse `albergue` (agregando `capacidad_maxima`) y `personas` pasó a ser `beneficiarios`.
   * Se cambiaron las referencias viejas en columnas y vistas (`id_albergue`, `id_beneficiario`, `beneficiario_activo`, `vista_ocupacion_albergue`).
@@ -38,20 +38,20 @@
   * Se volvió a poner la tabla `detalle_raciones`, ya que es necesaria para que el inventario no solo suba con las donaciones, sino que baje bien cuando se entrega comida. Sin ella se pierde el control de los lotes y no se pueden cumplir los objetivos de evitar desperdicios ni respaldar los reportes de consumo.
 
 ### Adaptación e Interfaz
-- **Ajustes y adaptación *(Cesar Sumi)*:** Se realizaron ajustes en los nombres de archivos y se adaptó la estructura inicial de la interfaz del refugio a los cambios de la base de datos.
+- **Ajustes y adaptación:** Se realizaron ajustes en los nombres de archivos y se adaptó la estructura inicial de la interfaz del refugio a los cambios de la base de datos.
 
 ### Actualización de Documentación
 - **`README.md` *(Ailin Cabaza)*:** Se subió y depuró el formato del archivo principal eliminando contenido duplicado e incluyendo la tabla con los nombres de los integrantes, sus usuarios de GitHub y los roles de cada uno en el grupo.
 
 ---
 
-## 14 de noviembre de 2026 — Prototipo: Funciones y Visualizador del login y menu principal (base) *(Cesar Sumi / Pedro Efrain Rada)*
+## 14 de noviembre de 2026 — Prototipo: Funciones y Visualizador del login y menu principal (base)
 
 ### Prototipo
-- **Definición del diseño y arquitectura *(Cesar Sumi / Pedro Efrain Rada)*:** Se estructuró la base visual y organizativa del proyecto:
+- **Definición del diseño y arquitectura:** Se estructuró la base visual y organizativa del proyecto:
   * Se definió el mockup con todas las pantallas y sus reglas, para tener una base del mockup en Canvas.
   * Se definió y actualizó la estructura de carpetas del proyecto (`Funciones/`, `Vistas/`, `conexion.py` y `main.py`), sincronizando los cambios con la rama `pedro` y aplicando pequeños ajustes a la base de datos.
-- **Interfaces desarrolladas en Tkinter *(Pedro Efrain Rada)*:** Se implementaron las vistas iniciales del sistema:
+- **Interfaces desarrolladas en Tkinter:** Se implementaron las vistas iniciales del sistema:
   * Login en Tkinter con bloqueo de 3 minutos tras 3 intentos fallidos (código listo, en pruebas).
   * Menú principal en Tkinter con las camas (total, ocupadas y disponibles) en un solo recuadro (por ahora los datos muestran 0).
 - **Configuración y seguridad local:** Se aseguraron los accesos de prueba a la base de datos:
@@ -64,20 +64,20 @@
 
 ---
 
-## 15 de noviembre de 2026 — Prototipo: Integración de vista y función `beneficiarios.py` al menú principal base *(Cesar Sumi / Pedro Efrain Rada)*
+## 15 de noviembre de 2026 — Prototipo: Integración de vista y función `beneficiarios.py` al menú principal base
 
 ### Módulo de Beneficiarios (Funciones y Vistas)
 - **Desarrollo y pruebas de `Beneficiarios` *(Cesar Sumi)*:** Se implementaron y probaron las funciones y vistas para ingresar, consultar y revisar registros de beneficiarios directamente en la base de datos.
 - **Adaptación visual *(Cesar Sumi)*:** Se actualizó la vista de `Beneficiarios` adaptándola al diseño de las ventanas principales (`Login` y `Panel`), dejando funcional el subprograma de registro y revisión.
 
 ### Conexión en `main.py` y menú principal
-- **Integración *(Pedro Efrain Rada)*:** Se unió el código de la vista de beneficiarios realizado por Cesar Sumi con la interfaz principal desarrollada por Pedro Efrain Rada:
+- **Integración:** Se unió el código de la vista de beneficiarios realizado por Cesar Sumi con la interfaz principal desarrollada por Pedro Efrain Rada:
   * Se enlazó la pantalla de `Beneficiarios` con el menú de navegación en `Principal`.
   * Se actualizaron las importaciones en `main.py` (`Login`, `Principal`, `Beneficiarios`) y se registró la vista en el diccionario `MODULOS["Beneficiarios"] = Beneficiarios` para que el sistema pueda abrirlo y funcionar.
 
 ---
 
-## 16 de noviembre de 2026 — Integración de ramas y pruebas funcionales de las primeras 3 pantallas *(Cesar Sumi)*
+## 16 de noviembre de 2026 — Integración de ramas y pruebas funcionales de las primeras 3 pantallas
 
 ### Fusión y Pruebas del Sistema Base
 - **Anexión de ramas:** Se integraron los avances de las ramas `pedro` y `cesar` unificando `Login`, `Panel` y `Beneficiarios` en un solo flujo funcional.
@@ -86,7 +86,7 @@
 
 ---
 
-## 19 de noviembre de 2026 — Reorganización de la base de datos en el repositorio y guía en README *(Claudio Yamil / Pedro Efrain Rada)*
+## 19 de noviembre de 2026 — Reorganización de la base de datos en el repositorio y guía en README
 
 ### Estructura y Documentación
 - **Carpeta `base_de_datos/` *(Claudio Yamil)*:** Se creó el directorio `base_de_datos` en el repositorio y se movió allí el archivo SQL principal para mantener separado el código fuente de los scripts de datos.
@@ -94,7 +94,7 @@
 
 ---
 
-## 20 de noviembre de 2026 — Módulo de Habitaciones y Camas, Ocupación, Conexión a BD y Validaciones *(Cesar Sumi / Pedro Efrain Rada)*
+## 20 de noviembre de 2026 — Módulo de Habitaciones y Camas, Ocupación, Conexión a BD y Validaciones
 
 ### Nuevas Funcionalidades e Integración
 - **Habitaciones, Camas y Ocupación *(Cesar Sumi)*:** Se creó y dejó completamente funcional el contenido del botón `Habitaciones y Camas` junto con el control de `Ocupación`.
@@ -104,17 +104,32 @@
 
 ---
 
-## 22 de noviembre de 2026 — Ajustes finales en documentación *(Pedro Efrain Rada)*
+## 22 de noviembre de 2026 — Ajustes finales en documentación
 
 ### Documentación
 - **`README.md`:** Se realizaron pequeñas correcciones de formato y redacción en el archivo principal del repositorio.
 
 ---
 
-## 25 de noviembre de 2026 — Mejora visual del menú principal y consolidación del programa preliminar *(Cesar Sumi / Ailin Cabaza)*
+## 25 de noviembre de 2026 — Mejora visual del menú principal y consolidación del programa preliminar
 
 ### Interfaz e Integración Final
 - **Mejora estética en el menú principal *(Ailin Cabaza)*:** Se actualizaron los estilos y la presentación visual del panel/menú principal para lograr un mejor aspecto en la interfaz de usuario.
 - **Fusión de cambios (`Merge branch 'cesar'`) *(Cesar Sumi)*:** Se integraron las últimas actualizaciones desarrolladas en la rama `cesar` hacia la rama principal.
 - **Programa preliminar funcional *(Cesar Sumi)*:** Se realizaron pruebas del sistema de refugios a través de distintas ramas verificando que los módulos conectados funcionen de manera estable.
 - **Soporte de base de datos *(Cesar Sumi)*:** Se incorporó un archivo temporal de prueba para agilizar la actualización y testeo de la base de datos.
+
+---
+
+## 27 de noviembre de 2026 — Validaciones, fechas automáticas, ajustes en raciones y alimentos, ajustes en la Base de Datos (E-R)
+- **Restricción de registro en beneficiarios:** Se retiró la opción para registrar personas externas en el módulo de beneficiarios, enfocando el registro en quienes corresponden al flujo actual del albergue.
+- **Validación de fecha de nacimiento:** Al registrar un beneficiario, se agregó validación sobre la fecha de nacimiento para rechazar valores imposibles (como años muy antiguos tipo `1000`), fechas futuras o fuera de un rango razonable, evitando errores en la base de datos y en los reportes.
+- **Validación de carnet de identidad:** Se ajustó la regla del CI para que acepte dígitos numéricos al inicio y, de forma opcional, 2 letras al final correspondientes a la extensión departamental.
+- **Formato automático en campos de fecha:** Se implementó formato automático mientras se escribe en los campos de fecha de Tkinter (`DD/MM/AAAA`): solo permite dígitos numéricos, limita la entrada a 8 números, inserta `/` automáticamente después del día y del mes, y permite borrar sin trabarse ni generar errores de formato.
+- **Nuevo tipo de comida en raciones:** Se añadió `"Té"` dentro de las opciones de tipo de comida en el módulo de Raciones para cubrir la hora del té junto con el resto de turnos del comedor.
+- **Eliminación de popup al crear registro o tabla:** Al crear el registro o tabla correspondiente en la vista, se quitó la ventana emergente (*popup*) de confirmación de éxito para que la interfaz se actualice directamente sin interrumpir el flujo.
+- **Actualizacion de relaciones en la Base de datos:** Se arreglo las relaciones faltantes entre el usuario y el albergue.
+
+### Pendiente
+- Adaptacion y pequeños cambios a la base de datos
+- Arreglar bug de estadisticas
