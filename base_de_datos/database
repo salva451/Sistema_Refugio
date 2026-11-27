@@ -1,18 +1,6 @@
 -- ================================================================
 -- BASE DE DATOS NUEVA - SISTEMA DE GESTION DEL ALBERGUE REMAR
 -- Compatible con MySQL 8.0.16 o superior.
---
--- IMPORTANTE:
--- Este script ELIMINA la base albergue_solidario si ya existe.
--- Se perderan todos sus datos. Exporta una copia antes de ejecutarlo
--- si necesitas conservar beneficiarios, usuarios, ingresos o historial.
---
--- Instalacion:
--- 1. Abrir este archivo en MySQL Workbench / DBeaver.
--- 2. Ejecutar el script completo.
--- 3. Crear el usuario administrador desde crear_admin.py.
--- 4. No ejecutar migracion_final.sql, migracion_cambios_2.sql
---    ni migrar_beneficiarios.py en una instalacion nueva.
 -- ================================================================
 
 CREATE DATABASE albergue_solidario
